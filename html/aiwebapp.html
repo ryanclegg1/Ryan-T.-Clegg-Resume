@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musher Dodge Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #d0f0ff; /* Light blue background */
+        }
+        canvas {
+            border: 3px solid #000;
+            background-color: #e0f7ff; /* Slightly lighter blue */
+        }
+    </style>
+</head>
+<body>
+    <h1><a href="../bootstrap.html">Return to Resume</a></h1> <br>
+    <canvas id="gameCanvas" width="512" height="640"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const tileSize = 32;
+        const rows = canvas.height / tileSize;
+        const columns = canvas.width / tileSize;
+
+        const musher = {
+            x: 6 * tileSize,
+            y: (rows - 1) * tileSize,
+            draw() {
+                // Sled with wooden planks
+                ctx.fillStyle = "#8B4513"; // Wood color
+                ctx.fillRect(this.x + 6, this.y + 28, 20, 4);
+                ctx.fillStyle = "#A0522D";
+                ctx.fillRect(this.x + 8, this.y + 32, 16, 4);
+
+                // Musher's body and winter coat
+                ctx.fillStyle = "#003366"; // Coat
+                ctx.fillRect(this.x + 10, this.y + 10, 12, 14);
+                ctx.fillStyle = "#FFDAB9"; // Face
+                ctx.fillRect(this.x + 12, this.y + 6, 8, 8);
+                ctx.fillStyle = "#800000"; // Red winter hat
+                ctx.fillRect(this.x + 12, this.y + 2, 8, 4);
+                ctx.fillStyle = "#fff"; // Hat pom-pom
+                ctx.fillRect(this.x + 15, this.y, 2, 2);
+
+                // Eyes and mouth
+                ctx.fillStyle = "#222"; // Eyes
+                ctx.fillRect(this.x + 14, this.y + 8, 2, 2);
+                ctx.fillRect(this.x + 18, this.y + 8, 2, 2);
+                ctx.fillRect(this.x + 16, this.y + 12, 2, 1); // Mouth
+            }
+        };
+
+        const husky = {
+            draw(x, y) {
+                // Husky body and tail
+                ctx.fillStyle = "#2F4F4F"; // Dark gray body
+                ctx.fillRect(x + 4, y + 18, 24, 8); 
+                ctx.fillStyle = "#A9A9A9"; // Lighter gray underside
+                ctx.fillRect(x + 6, y + 16, 20, 4);
+
+                // Husky face
+                ctx.fillStyle = "#4F4F4F"; // Dark head
+                ctx.fillRect(x, y + 14, 8, 8);
+                ctx.fillRect(x - 2, y + 12, 4, 4); // Ears
+                ctx.fillStyle = "#FFF"; // Eyes
+                ctx.fillRect(x + 2, y + 16, 2, 2);
+                ctx.fillStyle = "#333"; // Nose
+                ctx.fillRect(x + 6, y + 18, 1, 1);
+                ctx.fillStyle = "#000"; // Mouth
+                ctx.fillRect(x + 4, y + 20, 4, 1);
+            }
+        };
+
+        let moose = [];
+
+        function createMoose() {
+            moose = [];
+            for (let i = 0; i < 12; i++) { // Add more moose
+                const speed = Math.random() * 2 + 1;
+                moose.push({
+                    x: Math.random() > 0.5 ? canvas.width : -tileSize,
+                    y: (i + 1) * tileSize,
+                    speed: speed, // Consistent speed
+                    draw() {
+                        ctx.fillStyle = "#8B4513"; // Moose body
+                        ctx.fillRect(this.x + 4, this.y + 16, 24, 10);
+                        ctx.fillStyle = "#654321"; // Darker antlers and snout
+                        ctx.fillRect(this.x, this.y + 10, 8, 6); 
+                        ctx.fillRect(this.x + 24, this.y + 10, 8, 6); 
+                        ctx.fillStyle = "#000"; // Eyes
+                        ctx.fillRect(this.x + 10, this.y + 18, 2, 2);
+                        ctx.fillRect(this.x + 14, this.y + 18, 2, 2);
+                    }
+                });
+            }
+        }
+
+        function drawGoal() {
+            for (let i = 0; i < columns; i++) {
+                ctx.fillStyle = (i % 2 === 0) ? "#000" : "#FFF";
+                ctx.fillRect(i * tileSize, 0, tileSize, tileSize);
+            }
+        }
+
+        function drawMoose() {
+            moose.forEach((m) => m.draw());
+        }
+
+        function moveMoose() {
+            moose.forEach((m) => {
+                m.x += m.speed;
+                if (m.x > canvas.width + tileSize || m.x < -tileSize) m.speed *= -1;
+            });
+        }
+
+        function checkCollision() {
+            return moose.some(
+                (m) =>
+                    musher.x < m.x + tileSize &&
+                    musher.x + tileSize > m.x &&
+                    musher.y < m.y + tileSize &&
+                    musher.y + tileSize > m.y
+            );
+        }
+
+        function moveMusher(event) {
+            const key = event.keyCode;
+            if (key === 37 && musher.x > 0) musher.x -= tileSize;
+            if (key === 38 && musher.y > 0) musher.y -= tileSize;
+            if (key === 39 && musher.x < canvas.width - tileSize) musher.x += tileSize;
+            if (key === 40 && musher.y < canvas.height - tileSize) musher.y += tileSize;
+
+            if (musher.y === 0) {
+                setTimeout(() => {
+                    alert("You win! The musher reached the finish line!");
+                    resetGame();
+                }, 100);
+            }
+        }
+
+        function resetGame() {
+            musher.x = 6 * tileSize;
+            musher.y = (rows - 1) * tileSize;
+            createMoose();
+            gameLoop();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGoal();
+            musher.draw();
+            husky.draw(musher.x - 24, musher.y);
+            drawMoose();
+            moveMoose();
+            if (!checkCollision()) requestAnimationFrame(gameLoop);
+            else {
+                alert("Game over! You hit a moose.");
+                resetGame();
+            }
+        }
+
+        document.addEventListener("keydown", moveMusher);
+        createMoose();
+        gameLoop();
+    </script>
+</body>
+</html>
+
+
+
+
+

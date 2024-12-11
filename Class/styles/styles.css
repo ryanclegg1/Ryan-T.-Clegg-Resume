@@ -1,0 +1,43 @@
+body{
+    background-color: rgb(175, 231, 240);
+    color: rgb(0, 0, 0);
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+
+
+}
+h1, h2, h3, h4, h5, h6{ 
+    color: rgb(0, 0, 0);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-style: italic;
+
+}
+.main-content{
+    margin-left: 220px;
+    padding: 20px;
+
+}
+.sidebar{
+    background-color:rgb lightskyblue;
+    width:200px;
+    height:100px;
+    left:0;
+    padding:15px;
+    position:fixed
+
+}
+
+.navbar{
+    padding: 10px;
+    display:flex;
+    justify-content:space-around;
+    align-items: center;
+    color:white;
+}
+
+.box-model{
+    padding: 15px;
+    background-color: lightskyblue;
+    border:5px solid rgb(111, 0, 255);
+    margin: 2px;
+    Width:400px
+}
